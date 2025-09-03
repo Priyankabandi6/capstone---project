@@ -1,0 +1,112 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo/Brand -->
+    <div class="navbar-brand">
+      <a routerLink="/dashboard" class="brand-link">
+        <i class="fas fa-hospital"></i>
+        <span class="brand-text">Hospital Management</span>
+      </a>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <div class="navbar-menu desktop-menu">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Dashboard</span>
+      </a>
+      
+      <a routerLink="/patients" routerLinkActive="active" class="nav-link" *ngIf="hasRole('admin') || hasRole('doctor')">
+        <i class="fas fa-users"></i>
+        <span>Patients</span>
+      </a>
+      
+      <a routerLink="/doctors" routerLinkActive="active" class="nav-link" *ngIf="hasRole('admin')">
+        <i class="fas fa-user-md"></i>
+        <span>Doctors</span>
+      </a>
+      
+      <a routerLink="/appointments" routerLinkActive="active" class="nav-link">
+        <i class="fas fa-calendar-check"></i>
+        <span>Appointments</span>
+      </a>
+      
+      <a routerLink="/billing" routerLinkActive="active" class="nav-link" *ngIf="hasRole('admin')">
+        <i class="fas fa-file-invoice-dollar"></i>
+        <span>Billing</span>
+      </a>
+      
+      <a routerLink="/audit" routerLinkActive="active" class="nav-link" *ngIf="hasRole('admin')">
+        <i class="fas fa-shield-alt"></i>
+        <span>Audit</span>
+      </a>
+    </div>
+
+    <!-- User Menu -->
+    <div class="navbar-user">
+      <div class="user-info" *ngIf="currentUser">
+        <span class="user-name">{{ currentUser.firstName }} {{ currentUser.lastName }}</span>
+        <span class="user-role">{{ currentUser.role | titlecase }}</span>
+      </div>
+      
+      <div class="user-actions">
+        <button class="btn btn-profile" title="Profile">
+          <i class="fas fa-user-circle"></i>
+        </button>
+        <button class="btn btn-logout" (click)="logout()" title="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="navbar-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </div>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-menu" [class.active]="isMenuOpen">
+    <a routerLink="/dashboard" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenu()">
+      <i class="fas fa-tachometer-alt"></i>
+      <span>Dashboard</span>
+    </a>
+    
+    <a routerLink="/patients" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenu()" *ngIf="hasRole('admin') || hasRole('doctor')">
+      <i class="fas fa-users"></i>
+      <span>Patients</span>
+    </a>
+    
+    <a routerLink="/doctors" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenu()" *ngIf="hasRole('admin')">
+      <i class="fas fa-user-md"></i>
+      <span>Doctors</span>
+    </a>
+    
+    <a routerLink="/appointments" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenu()">
+      <i class="fas fa-calendar-check"></i>
+      <span>Appointments</span>
+    </a>
+    
+    <a routerLink="/billing" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenu()" *ngIf="hasRole('admin')">
+      <i class="fas fa-file-invoice-dollar"></i>
+      <span>Billing</span>
+    </a>
+    
+    <a routerLink="/audit" routerLinkActive="active" class="mobile-nav-link" (click)="closeMenu()" *ngIf="hasRole('admin')">
+      <i class="fas fa-shield-alt"></i>
+      <span>Audit</span>
+    </a>
+    
+    <div class="mobile-user-info" *ngIf="currentUser">
+      <div class="mobile-user-details">
+        <span class="mobile-user-name">{{ currentUser.firstName }} {{ currentUser.lastName }}</span>
+        <span class="mobile-user-role">{{ currentUser.role | titlecase }}</span>
+      </div>
+      <button class="btn btn-logout-mobile" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>

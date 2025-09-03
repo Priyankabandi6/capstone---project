@@ -1,0 +1,150 @@
+<div class="patient-dashboard">
+  <div class="dashboard-header">
+    <h1>Patient Dashboard</h1>
+    <p>Manage and view patient information</p>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="dashboard-controls">
+    <div class="search-section">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input 
+          type="text" 
+          placeholder="Search patients by name or contact..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+        >
+      </div>
+    </div>
+
+    <div class="filters-section">
+      <div class="filter-group">
+        <label for="status-filter">Status:</label>
+        <select 
+          id="status-filter" 
+          [(ngModel)]="selectedStatus"
+          (change)="onStatusChange()"
+        >
+          <option value="all">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="gender-filter">Gender:</label>
+        <select 
+          id="gender-filter" 
+          [(ngModel)]="selectedGender"
+          (change)="onGenderChange()"
+        >
+          <option value="all">All Genders</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patient Statistics -->
+  <div class="stats-section">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ patients.length }}</h3>
+        <p>Total Patients</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-user-check"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ patients.filter(p => p.status === 'Active').length }}</h3>
+        <p>Active Patients</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ patients.filter(p => new Date(p.lastVisit) > new Date(Date.now() - 30*24*60*60*1000)).length }}</h3>
+        <p>Recent Visits</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patients Table -->
+  <div class="patients-table-container">
+    <div class="table-header">
+      <h3>Patient List ({{ filteredPatients.length }})</h3>
+      <button class="btn btn-primary">
+        <i class="fas fa-plus"></i>
+        Add Patient
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="patients-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Contact</th>
+            <th>Blood Type</th>
+            <th>Last Visit</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let patient of filteredPatients" class="patient-row">
+            <td class="patient-name">
+              <div class="name-info">
+                <span class="name">{{ patient.name }}</span>
+                <span class="allergies" *ngIf="patient.allergies.length > 0">
+                  <i class="fas fa-exclamation-triangle" title="Allergies"></i>
+                  {{ patient.allergies.length }} allergies
+                </span>
+              </div>
+            </td>
+            <td>{{ patient.age }}</td>
+            <td>{{ patient.gender }}</td>
+            <td>{{ patient.contact }}</td>
+            <td>
+              <span class="blood-type">{{ patient.bloodType }}</span>
+            </td>
+                         <td>{{ patient.lastVisit | date:'MMM dd, yyyy' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(patient.status)">
+                {{ patient.status }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn btn-sm btn-info" (click)="viewPatientDetails(patient.id)" title="View Details">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="btn btn-sm btn-warning" (click)="editPatient(patient.id)" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredPatients.length === 0">
+      <i class="fas fa-search"></i>
+      <h3>No patients found</h3>
+      <p>Try adjusting your search criteria or filters</p>
+    </div>
+  </div>
+</div>

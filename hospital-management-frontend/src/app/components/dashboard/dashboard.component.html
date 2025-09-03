@@ -1,0 +1,100 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p>Welcome to the Hospital Management System</p>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let stat of stats">
+      <div class="stat-icon" [style.background-color]="stat.color">
+        <i [class]="stat.icon"></i>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ stat.value }}</h3>
+        <p class="stat-title">{{ stat.title }}</p>
+        <span class="stat-change" [class]="stat.changeType">
+          {{ stat.change }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="actions-grid">
+      <a routerLink="/patients" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <h3>Add Patient</h3>
+        <p>Register a new patient</p>
+      </a>
+      
+      <a routerLink="/appointments" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-calendar-plus"></i>
+        </div>
+        <h3>Schedule Appointment</h3>
+        <p>Book patient appointments</p>
+      </a>
+      
+      <a routerLink="/doctors" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-user-md"></i>
+        </div>
+        <h3>Manage Doctors</h3>
+        <p>Update doctor information</p>
+      </a>
+      
+      <a routerLink="/billing" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+        <h3>Process Billing</h3>
+        <p>Handle patient billing</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Activities -->
+  <div class="recent-activities">
+    <h2>Recent Activities</h2>
+    <div class="activities-list">
+      <div class="activity-item" *ngFor="let activity of recentActivities">
+        <div class="activity-icon" [style.background-color]="activity.color">
+          <i [class]="activity.icon"></i>
+        </div>
+        <div class="activity-content">
+          <p class="activity-message">{{ activity.message }}</p>
+          <span class="activity-time">{{ activity.time }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Status -->
+  <div class="system-status">
+    <h2>System Status</h2>
+    <div class="status-grid">
+      <div class="status-item">
+        <div class="status-indicator online"></div>
+        <span>Database</span>
+      </div>
+      <div class="status-item">
+        <div class="status-indicator online"></div>
+        <span>API Services</span>
+      </div>
+      <div class="status-item">
+        <div class="status-indicator online"></div>
+        <span>File Storage</span>
+      </div>
+      <div class="status-item">
+        <div class="status-indicator online"></div>
+        <span>Email Service</span>
+      </div>
+    </div>
+  </div>
+</div>
+

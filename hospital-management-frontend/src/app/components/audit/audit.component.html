@@ -1,0 +1,255 @@
+<div class="audit-container">
+  <!-- Header Section -->
+  <div class="audit-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <mat-icon class="title-icon">security</mat-icon>
+          Audit Logs
+        </h1>
+        <p class="page-subtitle">Monitor system activity and user actions across all modules</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="exportLogs()" class="export-btn">
+          <mat-icon>download</mat-icon>
+          Export Logs
+        </button>
+        <button mat-raised-button color="accent" (click)="refreshLogs()" class="refresh-btn">
+          <mat-icon>refresh</mat-icon>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <mat-card class="filters-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>filter_list</mat-icon>
+        Filters & Search
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="filters-grid">
+        <!-- Search Input -->
+        <mat-form-field class="search-field" appearance="outline">
+          <mat-label>Search logs...</mat-label>
+          <input matInput [(ngModel)]="searchTerm" placeholder="Search by user, action, details, or IP" (input)="applyFilter()">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <!-- Module Filter -->
+        <mat-form-field class="filter-field" appearance="outline">
+          <mat-label>Module</mat-label>
+          <mat-select [(ngModel)]="selectedModule" (selectionChange)="applyFilter()">
+            <mat-option *ngFor="let module of modules" [value]="module">
+              {{ module }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Status Filter -->
+        <mat-form-field class="filter-field" appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilter()">
+            <mat-option *ngFor="let status of statuses" [value]="status">
+              {{ status }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Date Range Filters -->
+        <mat-form-field class="filter-field" appearance="outline">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate" (dateChange)="applyFilter()">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field class="filter-field" appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate" (dateChange)="applyFilter()">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Action Buttons -->
+        <div class="filter-actions">
+          <button mat-stroked-button color="warn" (click)="clearFilters()" class="clear-btn">
+            <mat-icon>clear</mat-icon>
+            Clear Filters
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon success">check_circle</mat-icon>
+          <div class="stat-details">
+            <span class="stat-number">{{ getStatsCount('Success') }}</span>
+            <span class="stat-label">Successful Actions</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon warn">error</mat-icon>
+          <div class="stat-details">
+            <span class="stat-number">{{ getStatsCount('Failed') }}</span>
+            <span class="stat-label">Failed Actions</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon accent">warning</mat-icon>
+          <div class="stat-details">
+            <span class="stat-number">{{ getStatsCount('Warning') }}</span>
+            <span class="stat-label">Warnings</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon primary">info</mat-icon>
+          <div class="stat-details">
+            <span class="stat-number">{{ getStatsCount('Info') }}</span>
+            <span class="stat-label">Info Logs</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Data Table -->
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>table_chart</mat-icon>
+        Audit Logs
+        <span class="record-count">({{ filteredDataSource.length }} records)</span>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="filteredDataSource" class="audit-table">
+          <!-- Timestamp Column -->
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>schedule</mat-icon>
+              Timestamp
+            </th>
+            <td mat-cell *matCellDef="let log">
+              <div class="timestamp-cell">
+                <span class="date">{{ log.timestamp | date:'MMM dd, yyyy' }}</span>
+                <span class="time">{{ log.timestamp | date:'HH:mm:ss' }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- User Column -->
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>person</mat-icon>
+              User
+            </th>
+            <td mat-cell *matCellDef="let log">
+              <div class="user-cell">
+                <mat-icon class="user-icon">account_circle</mat-icon>
+                <span class="user-email">{{ log.user }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Action Column -->
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>touch_app</mat-icon>
+              Action
+            </th>
+            <td mat-cell *matCellDef="let log">
+              <span class="action-text">{{ log.action }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Module Column -->
+          <ng-container matColumnDef="module">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>category</mat-icon>
+              Module
+            </th>
+            <td mat-cell *matCellDef="let log">
+              <mat-chip [color]="getModuleColor(log.module)" selected class="module-chip">
+                {{ log.module }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Details Column -->
+          <ng-container matColumnDef="details">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>description</mat-icon>
+              Details
+            </th>
+            <td mat-cell *matCellDef="let log">
+              <div class="details-cell">
+                <span class="details-text" [title]="log.details">{{ log.details }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- IP Address Column -->
+          <ng-container matColumnDef="ipAddress">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>router</mat-icon>
+              IP Address
+            </th>
+            <td mat-cell *matCellDef="let log">
+              <code class="ip-address">{{ log.ipAddress }}</code>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>flag</mat-icon>
+              Status
+            </th>
+            <td mat-cell *matCellDef="let log">
+              <mat-chip [color]="getStatusColor(log.status)" selected class="status-chip">
+                <mat-icon class="status-icon">{{ getStatusIcon(log.status) }}</mat-icon>
+                {{ log.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- No Data Message -->
+        <div *ngIf="filteredDataSource.length === 0" class="no-data">
+          <mat-icon class="no-data-icon">search_off</mat-icon>
+          <h3>No audit logs found</h3>
+          <p>Try adjusting your filters or search criteria</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
